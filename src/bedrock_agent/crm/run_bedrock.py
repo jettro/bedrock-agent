@@ -1,29 +1,14 @@
 import uuid
 
 import boto3
-from mcp import StdioServerParameters
 
 
 from bedrock_agent.inline_agent_utils import invoke_inline_agent_helper
 
 async def main():
-    order_server_params = StdioServerParameters(
-        command="uv",
-        args=[
-            "run",
-            "--with",
-            "mcp",
-            "mcp",
-            "run",
-            "src/bedrock_agent/crm/orders_mcp.py"
-        ]
-    )
-
-    order_server_client = await MCPClient.create(server_params=order_server_params)
 
     orders_action_group = {
         "name": "OrdersActionGroup",
-        "mcp_clients": [order_server_client]
     }
 
     region = "eu-west-1"

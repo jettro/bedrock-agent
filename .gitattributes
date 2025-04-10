@@ -1,0 +1,4 @@
+# Strip outputs from all Jupyter notebooks before committing
+*.ipynb filter=nbstripout
+*.zpln filter=nbstripout
+*.ipynb diff=ipynb
