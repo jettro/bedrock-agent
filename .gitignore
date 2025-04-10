@@ -1,0 +1,6 @@
+.venv
+.idea
+export
+
+**/__pycache__/
+.env
