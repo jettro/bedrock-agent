@@ -48,6 +48,7 @@ def invoke_inline_agent_helper(client, request_params, trace_level="core"):
 
     _agent_answer = ""
     _event_stream = _agent_resp["completion"]
+    print(_agent_resp)
 
     try:
         for _event in _event_stream:
@@ -310,5 +311,6 @@ def invoke_inline_agent_helper(client, request_params, trace_level="core"):
         print(
             f"  request ID: {_agent_resp['ResponseMetadata']['RequestId']}, retries: {_agent_resp['ResponseMetadata']['RetryAttempts']}\n"
         )
+        print(f"Agent response object: {_agent_resp}")
         print(f"Error: {e}")
         raise Exception("Unexpected exception: ", e)

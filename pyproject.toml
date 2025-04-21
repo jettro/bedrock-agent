@@ -15,14 +15,12 @@ dependencies = [
     "termcolor (>=3.0.1,<4.0.0)",
     "rich (>=14.0.0,<15.0.0)",
     "nbstripout (>=0.8.1,<0.9.0)",
+    "notebook (>=7.4.0,<8.0.0)",
 ]
 
 [tool.poetry]
 packages = [{include = "bedrock_agent", from = "src"}]
 
-
-[tool.poetry.group.dev.dependencies]
-notebook = "^7.4.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -14,13 +14,15 @@ class NonCollaboratingAgent(ABC):
 
     def agent_request_params(self) -> dict:
         basic_config = {
+            "enableTrace": True,
+            "endSession": False,
             "foundationModel": self.foundational_model,
             "instruction": self.instructions,
             "agentCollaboration": "DISABLED",
             "sessionId": self.session_id,
         }
         if self.action_group:
-            basic_config["actionGroups"] = {
+            basic_config["actionGroups"] = [{
                 "actionGroupName": self.action_group["name"],
                 "actionGroupExecutor": {
                     "lambda": self.action_group["executor"]
@@ -29,7 +31,7 @@ class NonCollaboratingAgent(ABC):
                     "payload": self.action_group["payload"]
                 },
                 "description": self.action_group["description"]
-            }
+            }]
 
         return basic_config
 

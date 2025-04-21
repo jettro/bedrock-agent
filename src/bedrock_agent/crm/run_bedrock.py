@@ -3,7 +3,7 @@ import uuid
 import boto3
 
 
-from bedrock_agent.inline_agent_utils import invoke_inline_agent_helper
+from bedrock_agent.utils.inline_agent_utils import invoke_inline_agent_helper
 
 async def main():
 

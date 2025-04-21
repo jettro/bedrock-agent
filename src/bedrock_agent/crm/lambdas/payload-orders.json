@@ -1,0 +1,260 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Orders API",
+    "description": "API to manage order documents stored in S3",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/orders": {
+      "post": {
+        "summary": "Create a new order",
+        "description": "Create a new order using the provided details. Can only be used to create one order at a time.",
+        "operationId": "createOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "orderId","customer", "orderLines", "total"
+                ],
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "description": "The identifier for the order"
+                  },
+                  "customer": {
+                    "type": "string",
+                    "description": "Name of the customer creating the order"
+                  },
+                  "orderLines": {
+                    "type": "array",
+                    "description": "List of items in the order",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "product": {
+                              "type": "string",
+                              "description": "Name of the product to order"
+                            },
+                            "qty": {
+                              "type": "integer",
+                              "description": "Quantity of the product to order"
+                            }
+                        },
+                        "example": {
+                            "product": "Hamburger",
+                            "qty": 2
+                        }
+                    }
+                  },
+                  "total": {
+                    "type": "number",
+                    "description": "Total value of the order"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "confirmationMessage": {
+                      "type": "string",
+                      "description": "Confirmation message for the order creation"
+                    },
+                    "orderId": {
+                      "type": "string",
+                      "description": "The identifier for the created order"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. One or more required fields are missing or invalid."
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Get a specific order",
+        "operationId": "getOrder",
+        "description": "Retrieve a specific order by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier for the order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing order",
+        "description": "Update an existing order by ID",
+        "operationId": "updateOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier for the order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "order_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an order",
+        "description": "Delete an order by ID",
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier for the order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order deleted successfully"
+          },
+          "404": {
+            "description": "Order not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "required": [
+          "orderId", "customer", "orderLines", "total"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "The identifier for the order"
+          },
+          "customer": {
+            "type": "string",
+            "description": "Name of the customer creating the order"
+          },
+          "orderLines": {
+            "type": "array",
+            "description": "List of items in the order",
+            "items": {
+              "type": "object",
+              "required": [
+                "product",
+                "qty"
+              ],
+              "properties": {
+                "product": {
+                  "type": "string",
+                  "description": "Name of the product to order"
+                },
+                "qty": {
+                  "type": "integer",
+                  "description": "Quantity of the product to order"
+                }
+              },
+              "example": {
+                "product": "Hamburger",
+                "qty": 2
+              }
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total value of the order"
+          }
+        },
+        "example": {
+          "orderId": "345",
+          "customer": "Jeroen",
+          "orderLines": [
+              {
+              "product": "Hamburger",
+              "qty": 2
+              },
+              {
+              "product": "Fries",
+              "qty": 1
+              }
+          ],
+          "total": 20.00
+        }
+      }
+    }
+  }
+}

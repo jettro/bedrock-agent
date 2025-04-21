@@ -1,65 +1,75 @@
 import os
-import pickle
 
-from dotenv import load_dotenv
-from pandas import DataFrame
+import boto3
 
-from bedrock_agent.crm.models import UserInfo, Order
+from bedrock_agent.crm.non_collaborating_agent import NonCollaboratingAgent
+from bedrock_agent.utils.inline_agent_utils import load_json_file
+from bedrock_agent.utils.lambda_creator import create_lambda_function_and_its_resources, \
+    remove_lambda_function_and_its_resources
 
-_ = load_dotenv()
-base_dir = os.path.dirname(os.path.abspath(__file__))
-database_file_path = os.path.join(base_dir, "../../../export/database.pickl")
-
-
-def load_orders() -> DataFrame:
-    """Load the orders from the database"""
-    with open(database_file_path, 'rb') as f:
-        data = pickle.load(f)
-
-    return data
+ORDER_SUPPORT_AGENT_LAMBDA_NAME = "inline-agent-order-handler"
+ORDER_SUPPORT_AGENT_BUCKET_NAME = "inline-agent-sample-orders-bucket"
 
 
-def init_database():
-    """Initialize the database with some orders"""
-    data = DataFrame({
-        "user_id": ["1", "2"],
-        "order_id": ["123", "124"],
-        "status": ["shipped", "processing"],
-        "delivery_date": ["2022-06-15", None]
-    })
+class OrderSupportAgent(NonCollaboratingAgent):
+    def __init__(self, aws_region: str,foundational_model: str = None, session_id: str = None):
+        instructions = (
+            "You are the Order Support Agent. Your primary goal is to provide detailed, accurate, and helpful information "
+            "about the orders. Use only the information from the provided tools. If order is not available, "
+            "do not make up information, tell that you do not know."
+            "\nNext to fetching information, you also have the ability to create, update and delete orders. "
+        )
+        super().__init__(instructions, foundational_model, session_id)
+        self.name = "Order Support Agent"
+        self.lambda_name = ORDER_SUPPORT_AGENT_LAMBDA_NAME
+        self.bucket_name = ORDER_SUPPORT_AGENT_BUCKET_NAME
 
-    with open(database_file_path, 'wb') as file_write:
-        pickle.dump(data, file_write)
+        sts_client = boto3.client("sts")
+        self.account_id = sts_client.get_caller_identity()["Account"]
+        self.aws_region = aws_region
 
+        # Initialise the ActionGroup
+        self._verify_lambda()
+        self._add_action_group()
 
-def find_order_information_for_user(user_info: UserInfo, order_id: str) -> Order | None:
-    """Find the information about an order, if no order is found return a message
-    telling that the order was not found.
+    def _verify_lambda(self):
+        # Get the directory of the current script
+        script_dir = os.path.dirname(__file__)
 
-    Args:
-        user_info(UserInfo): The user information to find the order for
-        order_id (str): The order id to find the information for
-    """
-    orders = load_orders()
-    user_orders = orders.query("user_id == @user_info.user_id and order_id == @order_id")
+        # Construct the path to lambda_function_order_handler.py
+        lambda_function_path = os.path.join(script_dir, "lambdas","lambda_function_order_handler.py")
 
-    if user_orders.empty:
-        return None
+        resources = create_lambda_function_and_its_resources(
+            region=self.aws_region,
+            account_id=self.account_id,
+            custom_name=self.lambda_name,
+            lambda_code_path=lambda_function_path,
+            bucket_name=self.bucket_name,
+        )
+        lambda_function = resources['lambda_function']
+        self.lambda_function_arn = lambda_function['FunctionArn']
 
-    order = user_orders.iloc[0]
-    return Order(
-        user_id=order["user_id"],
-        order_id=order["order_id"],
-        status=order["status"],
-        delivery_date=order["delivery_date"]
-    )
+    def _add_action_group(self):
+        # Get the directory of the current script
+        script_dir = os.path.dirname(__file__)
 
+        # Construct the path to lambda_function_order_handler.py
+        handle_orders_file = os.path.join(script_dir, "lambdas","payload-orders.json")
+        handle_orders_payload = load_json_file(handle_orders_file)
 
-def main():
-    # Check for existing database
-    if not os.path.exists(database_file_path):
-        init_database()
+        self.action_group = {
+            "name": "HandleOrders",
+            "executor": self.lambda_function_arn,
+            "payload": handle_orders_payload,
+            "description": "This action group handles the orders."
+        }
 
-
-if __name__ == "__main__":
-    main()
+    def clean_up(self):
+        """Clean up the resources used by the agent"""
+        # Remove the lambda function and its resources
+        remove_lambda_function_and_its_resources(
+            region=self.aws_region,
+            account_id=self.account_id,
+            custom_name=self.lambda_name,
+            bucket_name=self.bucket_name,
+        )
