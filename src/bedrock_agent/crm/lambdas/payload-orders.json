@@ -16,45 +16,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "orderId","customer", "orderLines", "total"
-                ],
-                "properties": {
-                  "orderId": {
-                    "type": "string",
-                    "description": "The identifier for the order"
-                  },
-                  "customer": {
-                    "type": "string",
-                    "description": "Name of the customer creating the order"
-                  },
-                  "orderLines": {
-                    "type": "array",
-                    "description": "List of items in the order",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "product": {
-                              "type": "string",
-                              "description": "Name of the product to order"
-                            },
-                            "qty": {
-                              "type": "integer",
-                              "description": "Quantity of the product to order"
-                            }
-                        },
-                        "example": {
-                            "product": "Hamburger",
-                            "qty": 2
-                        }
-                    }
-                  },
-                  "total": {
-                    "type": "number",
-                    "description": "Total value of the order"
-                  }
-                }
+                "$ref": "#/components/schemas/Order"
               }
             }
           }

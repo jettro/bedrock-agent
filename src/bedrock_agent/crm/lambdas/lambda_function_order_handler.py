@@ -65,7 +65,7 @@ def normalize_bedrock_event(event):
     if isinstance(raw_order_lines, str):
         logger.info(f"Raw order lines is a string: {raw_order_lines}")
 
-        pattern = r"{item=([^,]+), quantity=(\d+)}"
+        pattern = r"{(?:item|product)=([^,]+), quantity=(\d+)}"
         matches = re.findall(pattern, raw_order_lines)
         payload["orderLines"] = [
             {"product": item.strip(), "qty": int(qty)}
