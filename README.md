@@ -18,6 +18,7 @@ The examples work in the Customer Relationship Management (CRM) domain. The exam
 
 The notebooks that show you the way to run agents are:
 - **run_marketing_agent.ipynb**: This is a very basic agent that does not use any knowledge bases or action groups. It only uses the LLM to generate a response to questions about the company.
+- **run_order_support_agent.ipynb**: This agent uses an action group with an OpenAPI spec and a lambda to request order information and create new orders.
 
 
 ## References

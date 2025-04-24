@@ -32,6 +32,10 @@ class NonCollaboratingAgent(ABC):
                 },
                 "description": self.action_group["description"]
             }]
+        if self.knowledge_base:
+            basic_config["knowledgeBases"] = [
+                self.knowledge_base
+            ]
 
         return basic_config
 

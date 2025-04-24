@@ -12,7 +12,7 @@ ORDER_SUPPORT_AGENT_BUCKET_NAME = "inline-agent-sample-orders-bucket"
 
 
 class OrderSupportAgent(NonCollaboratingAgent):
-    def __init__(self, aws_region: str,foundational_model: str = None, session_id: str = None):
+    def __init__(self, aws_region: str, foundational_model: str = None, session_id: str = None):
         instructions = (
             "You are the Order Support Agent. Your primary goal is to provide detailed, accurate, and helpful information "
             "about the orders. Use only the information from the provided tools. If order is not available, "
@@ -37,7 +37,7 @@ class OrderSupportAgent(NonCollaboratingAgent):
         script_dir = os.path.dirname(__file__)
 
         # Construct the path to lambda_function_order_handler.py
-        lambda_function_path = os.path.join(script_dir, "lambdas","lambda_function_order_handler.py")
+        lambda_function_path = os.path.join(script_dir, "lambdas", "lambda_function_order_handler.py")
 
         resources = create_lambda_function_and_its_resources(
             region=self.aws_region,
@@ -54,7 +54,7 @@ class OrderSupportAgent(NonCollaboratingAgent):
         script_dir = os.path.dirname(__file__)
 
         # Construct the path to lambda_function_order_handler.py
-        handle_orders_file = os.path.join(script_dir, "lambdas","payload-orders.json")
+        handle_orders_file = os.path.join(script_dir, "lambdas", "payload-orders.json")
         handle_orders_payload = load_json_file(handle_orders_file)
 
         self.action_group = {
