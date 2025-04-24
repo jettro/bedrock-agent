@@ -12,8 +12,7 @@ class ProductSupportAgent(NonCollaboratingAgent):
             "about the products. Use only the information from the provided AWS knowledge base. If the information is not available, "
             "do not make up information, tell that you do not know."
         )
-        super().__init__(instructions, foundational_model, session_id)
-        self.name = "Product Support Agent"
+        super().__init__(instructions, foundational_model, session_id, name="product_support_agent")
         self.aws_region = aws_region
         self.knowledge_base_id = KNOWLEDGE_BASE_ID
 
