@@ -19,7 +19,7 @@ class OrderSupportAgent(NonCollaboratingAgent):
             "do not make up information, tell that you do not know."
             "\nNext to fetching information, you also have the ability to create, update and delete orders. "
         )
-        super().__init__(instructions, foundational_model, session_id, name="order_support_agent")
+        super().__init__(instructions=instructions, foundational_model=foundational_model, session_id=session_id, name="order_support_agent")
         self.lambda_name = ORDER_SUPPORT_AGENT_LAMBDA_NAME
         self.bucket_name = ORDER_SUPPORT_AGENT_BUCKET_NAME
 
